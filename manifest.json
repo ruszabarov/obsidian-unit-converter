@@ -1,11 +1,9 @@
 {
-	"id": "obsidian-unit-converter",
+	"id": "unit-converter",
 	"name": "Unit Converter",
 	"version": "1.0.0",
 	"minAppVersion": "1.7.7",
 	"description": "Converts units right in your Markdown files.",
 	"author": "Ruslan Zabarov",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
 	"isDesktopOnly": false
 }

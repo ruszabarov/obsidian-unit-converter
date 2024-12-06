@@ -1,4 +1,4 @@
-import { Plugin, Setting, PluginSettingTab, App } from "obsidian";
+import { Plugin, Setting, PluginSettingTab } from "obsidian";
 import convert from "convert-units";
 
 interface UnitConverterSettings {

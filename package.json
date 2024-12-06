@@ -1,5 +1,5 @@
 {
-	"name": "obsidian-unit-converter",
+	"name": "unit-converter",
 	"version": "1.0.0",
 	"description": "Converts units right in your Markdown files.",
 	"main": "main.js",
