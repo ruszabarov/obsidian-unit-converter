@@ -1,6 +1,6 @@
 {
 	"name": "unit-converter",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Converts units right in your Markdown files.",
 	"main": "main.js",
 	"scripts": {
