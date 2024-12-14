@@ -1,5 +1,3 @@
-(window as any).global = window;
-
 import { Plugin, Setting, PluginSettingTab } from "obsidian";
 import convert from "convert-units";
 

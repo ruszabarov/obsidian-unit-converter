@@ -9,11 +9,17 @@ if you want to view the source, please visit the github repository of this plugi
 */
 `;
 
+const globalPolyfill = `
+if (typeof window !== 'undefined' && typeof window.global === 'undefined') {
+    window.global = window;
+}
+`;
+
 const prod = (process.argv[2] === "production");
 
 const context = await esbuild.context({
 	banner: {
-		js: banner,
+		js: banner + globalPolyfill,
 	},
 	entryPoints: ["main.ts"],
 	bundle: true,
