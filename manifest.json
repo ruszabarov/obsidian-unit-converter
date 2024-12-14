@@ -1,7 +1,7 @@
 {
 	"id": "unit-converter",
 	"name": "Unit Converter",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"minAppVersion": "1.7.7",
 	"description": "Converts units right in your Markdown files.",
 	"author": "Ruslan Zabarov",
