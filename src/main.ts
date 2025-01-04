@@ -1,13 +1,7 @@
-import { Plugin, Setting, PluginSettingTab } from "obsidian";
+import { Plugin } from "obsidian";
 import convert from "convert-units";
-
-interface UnitConverterSettings {
-	useDescriptiveNames: boolean;
-}
-
-const DEFAULT_SETTINGS: UnitConverterSettings = {
-	useDescriptiveNames: false,
-};
+import { DEFAULT_SETTINGS, UnitConverterSettings, UnitConverterSettingTab } from "./settings";
+import DestinationUnitSuggest from "./suggest/to-unit-suggest";
 
 export default class UnitConverterPlugin extends Plugin {
 	settings: UnitConverterSettings;
@@ -16,6 +10,10 @@ export default class UnitConverterPlugin extends Plugin {
 		await this.loadSettings();
 
 		this.addSettingTab(new UnitConverterSettingTab(this));
+
+		if (this.settings.isAutosuggestEnabled) {
+			this.registerEditorSuggest(new DestinationUnitSuggest(this));
+		}
 
 		this.registerMarkdownPostProcessor((element: HTMLElement) => {
 			const regex = /\[([\d.]+)([a-zA-Z0-9\-/]+)\|([a-zA-Z0-9\-/]+)\]/g;
@@ -94,30 +92,3 @@ export default class UnitConverterPlugin extends Plugin {
 	}
 }
 
-class UnitConverterSettingTab extends PluginSettingTab {
-	plugin: UnitConverterPlugin;
-
-	constructor(plugin: UnitConverterPlugin) {
-		super(plugin.app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const { containerEl } = this;
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName("Use descriptive unit names")
-			.setDesc(
-				'Display full unit names (e.g., "kilometers" instead of "km")'
-			)
-			.addToggle((toggle) =>
-				toggle
-					.setValue(this.plugin.settings.useDescriptiveNames)
-					.onChange(async (value) => {
-						this.plugin.settings.useDescriptiveNames = value;
-						await this.plugin.saveSettings();
-					})
-			);
-	}
-}
