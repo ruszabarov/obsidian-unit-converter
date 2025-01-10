@@ -4,7 +4,8 @@ export default {
     dir: ".",
     sourcemap: true,
     format: "cjs",
-    exports: "default"
+    exports: "default",
+    banner: 'if (typeof window !== "undefined" && typeof window.global === "undefined") { window.global = window; }'
   },
   external: ["obsidian"],
   esbuild: {
