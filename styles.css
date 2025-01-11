@@ -1,8 +1,11 @@
-/*
+.measure-from-container {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+		justify-content: space-between;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
+.measure-from-container .setting-item {
+    border-top: none;
+		padding: 0.75em 0;
+}
