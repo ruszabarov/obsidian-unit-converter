@@ -1,7 +1,12 @@
-import { Plugin } from "obsidian";
-import convert from "convert-units";
-import { DEFAULT_SETTINGS, UnitConverterSettings, UnitConverterSettingTab } from "./settings";
+import { Plugin, Editor } from "obsidian";
+import convert, { Unit } from "convert-units";
+import {
+	DEFAULT_SETTINGS,
+	UnitConverterSettings,
+	UnitConverterSettingTab,
+} from "./settings";
 import DestinationUnitSuggest from "./suggest/to-unit-suggest";
+import { ConversionModal } from "./modal/conversion-modal";
 
 export default class UnitConverterPlugin extends Plugin {
 	settings: UnitConverterSettings;
@@ -14,6 +19,20 @@ export default class UnitConverterPlugin extends Plugin {
 		if (this.settings.isAutosuggestEnabled) {
 			this.registerEditorSuggest(new DestinationUnitSuggest(this));
 		}
+
+		this.addCommand({
+			id: "convert-units",
+			name: "Convert units",
+			editorCallback: (editor: Editor) => {
+				new ConversionModal(
+					this.app,
+					(value: number, fromUnit: Unit, toUnit: Unit) => {
+						const conversionString = `[${value}${fromUnit}|${toUnit}]`;
+						editor.replaceSelection(conversionString);
+					}
+				).open();
+			},
+		});
 
 		this.registerMarkdownPostProcessor((element: HTMLElement) => {
 			const regex = /\[([\d.]+)([a-zA-Z0-9\-/]+)\|([a-zA-Z0-9\-/]+)\]/g;
@@ -91,4 +110,3 @@ export default class UnitConverterPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 }
-
