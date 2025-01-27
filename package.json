@@ -19,7 +19,7 @@
 		"@typescript-eslint/eslint-plugin": "^8.21.0",
 		"@typescript-eslint/parser": "^8.21.0",
 		"builtin-modules": "4.0.0",
-		"eslint": "^9.18.0",
+		"eslint": "^9.19.0",
 		"globals": "^15.14.0",
 		"obsidian": "latest",
 		"rolldown": "^1.0.0-beta.1",
