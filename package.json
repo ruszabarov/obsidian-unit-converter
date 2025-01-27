@@ -13,7 +13,7 @@
 	"author": "Ruslan Zabarov",
 	"license": "MIT",
 	"devDependencies": {
-		"@eslint/js": "^9.16.0",
+		"@eslint/js": "^9.19.0",
 		"@types/convert-units": "^2.3.11",
 		"@types/node": "^22.10.7",
 		"@typescript-eslint/eslint-plugin": "^8.21.0",
