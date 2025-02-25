@@ -1,4 +1,4 @@
-import UnitConverterPlugin from "src/main";
+import UnitConverterPlugin from "src/editor/post-processor";
 import {
 	Editor,
 	EditorPosition,
@@ -20,7 +20,7 @@ export default class DestinationUnitSuggest extends EditorSuggest<DestinationUni
 
 	onTrigger(
 		cursor: EditorPosition,
-		editor: Editor,
+		editor: Editor
 	): EditorSuggestTriggerInfo | null {
 		const line = editor.getLine(cursor.line);
 		const subString = line.substring(0, cursor.ch);
@@ -29,8 +29,8 @@ export default class DestinationUnitSuggest extends EditorSuggest<DestinationUni
 		const match = subString.match(/\[([\d.]+)([a-zA-Z0-9\-/]+)\|$/);
 		if (!match) return null;
 
-		const [,, fromUnit] = match;
-		
+		const [, , fromUnit] = match;
+
 		try {
 			// Verify if the fromUnit is valid
 			convert().from(fromUnit as Unit);
@@ -53,7 +53,9 @@ export default class DestinationUnitSuggest extends EditorSuggest<DestinationUni
 	getSuggestions(context: EditorSuggestContext): DestinationUnitCompletion[] {
 		const fromUnit = context.query;
 		try {
-			const possibilities = convert().from(fromUnit as Unit).possibilities();
+			const possibilities = convert()
+				.from(fromUnit as Unit)
+				.possibilities();
 			return possibilities.map((unit) => {
 				const measure = convert().describe(unit);
 				return {
@@ -80,14 +82,10 @@ export default class DestinationUnitSuggest extends EditorSuggest<DestinationUni
 			line: start.line,
 			ch: start.ch + value.value.length,
 		};
-		editor.replaceRange(
-			value.value,
-			start,
-			{
-				line: start.line,
-				ch: start.ch,
-			}
-		);
+		editor.replaceRange(value.value, start, {
+			line: start.line,
+			ch: start.ch,
+		});
 		editor.setCursor(endPos);
 	}
 }

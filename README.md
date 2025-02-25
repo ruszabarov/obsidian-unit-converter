@@ -3,6 +3,7 @@
 This plugin allows you to seamlessly convert units directly within your Obsidian notes, making it easier to work with data across various systems and contexts without leaving your markdown editor.
 
 ## Basic Syntax
+
 Use the following syntax within your notes to perform inline conversion:
 `[<value><source unit>|<target unit>]`
 
@@ -10,11 +11,10 @@ Use the following syntax within your notes to perform inline conversion:
 
 <img src="https://github.com/user-attachments/assets/a191b540-decd-4f2e-930b-0aa8a9f71678" alt="obsidian-unit-converter" width="500">
 
-
 ## Features
 
-- [Autosuggest](#autosuggest)
-- [Convert units command](#convert-units-command)
+-   [Autosuggest](#autosuggest)
+-   [Convert units command](#convert-units-command)
 
 ### Autosuggest
 

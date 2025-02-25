@@ -1,5 +1,5 @@
 import { Plugin, Editor } from "obsidian";
-import convert, { Unit } from "convert-units";
+import { Unit } from "convert-units";
 import {
 	DEFAULT_SETTINGS,
 	UnitConverterSettings,
@@ -7,9 +7,13 @@ import {
 } from "./settings";
 import DestinationUnitSuggest from "./suggest/to-unit-suggest";
 import { ConversionModal } from "./modal/conversion-modal";
+import { createUnitConversionExtension } from "./editor/extension";
+import { createMarkdownPostProcessor } from "./editor/md-post-processor";
+import { Extension } from "@codemirror/state";
 
 export default class UnitConverterPlugin extends Plugin {
 	settings: UnitConverterSettings;
+	private editorExtension: Extension;
 
 	async onload() {
 		await this.loadSettings();
@@ -19,6 +23,28 @@ export default class UnitConverterPlugin extends Plugin {
 		if (this.settings.isAutosuggestEnabled) {
 			this.registerEditorSuggest(new DestinationUnitSuggest(this));
 		}
+
+		this.registerEvent(
+			this.app.workspace.on("layout-change", () => {
+				this.refreshEditorExtensions();
+			})
+		);
+
+		this.registerEvent(
+			this.app.workspace.on("active-leaf-change", () => {
+				this.refreshEditorExtensions();
+			})
+		);
+
+		this.registerEvent(
+			this.app.workspace.on("editor-change", () => {
+				this.refreshEditorExtensions();
+			})
+		);
+
+		this.registerMarkdownPostProcessor(
+			createMarkdownPostProcessor(this.settings)
+		);
 
 		this.addCommand({
 			id: "convert-units",
@@ -34,68 +60,19 @@ export default class UnitConverterPlugin extends Plugin {
 			},
 		});
 
-		this.registerMarkdownPostProcessor((element: HTMLElement) => {
-			const regex = /\[([\d.]+)([a-zA-Z0-9\-/]+)\|([a-zA-Z0-9\-/]+)\]/g;
+		this.refreshEditorExtensions();
+	}
 
-			const walker = document.createTreeWalker(
-				element,
-				NodeFilter.SHOW_TEXT,
-				null
-			);
-			let node = walker.nextNode();
+	refreshEditorExtensions() {
+		// Unregister previous extension if it exists
+		if (this.editorExtension) {
+			this.app.workspace.updateOptions();
+		}
 
-			while (node) {
-				const text = node.nodeValue;
-
-				if (!text) {
-					continue;
-				}
-
-				const newText = text.replace(
-					regex,
-					(match, valueStr, fromUnit, toUnit) => {
-						const value = parseFloat(valueStr);
-						let convertedValue: number;
-						let displayUnit = toUnit;
-
-						try {
-							convertedValue = convert(value)
-								.from(fromUnit)
-								.to(toUnit);
-
-							if (this.settings.useDescriptiveNames) {
-								try {
-									const measure = convert().describe(toUnit);
-									if (measure && measure.plural) {
-										displayUnit = (
-											convertedValue === 1
-												? measure.singular
-												: measure.plural
-										).toLowerCase();
-									}
-								} catch (e) {
-									console.error(
-										"Error getting descriptive name:",
-										e
-									);
-								}
-							}
-						} catch (e) {
-							console.error("Conversion error:", e);
-							return match; // Return the original text if conversion fails
-						}
-
-						return `${convertedValue.toFixed(2)} ${displayUnit}`;
-					}
-				);
-
-				if (newText !== text) {
-					node.nodeValue = newText;
-				}
-
-				node = walker.nextNode();
-			}
-		});
+		if (this.settings.livePreviewInEditMode) {
+			this.editorExtension = createUnitConversionExtension(this);
+			this.registerEditorExtension(this.editorExtension);
+		}
 	}
 
 	async loadSettings() {
