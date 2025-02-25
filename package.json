@@ -5,6 +5,7 @@
 	"description": "Converts units right in your Markdown files.",
 	"main": "main.js",
 	"scripts": {
+		"preinstall": "npx only-allow pnpm",
 		"dev": "rolldown --config rolldown.config.js -w",
 		"build": "rolldown --config rolldown.config.js",
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
