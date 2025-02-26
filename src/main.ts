@@ -26,18 +26,7 @@ export default class UnitConverterPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on("layout-change", () => {
-				this.refreshEditorExtensions();
-			})
-		);
-
-		this.registerEvent(
-			this.app.workspace.on("active-leaf-change", () => {
-				this.refreshEditorExtensions();
-			})
-		);
-
-		this.registerEvent(
-			this.app.workspace.on("editor-change", () => {
+				console.log("layout-change");
 				this.refreshEditorExtensions();
 			})
 		);
@@ -85,5 +74,6 @@ export default class UnitConverterPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		this.refreshEditorExtensions();
 	}
 }

@@ -14,8 +14,7 @@ import {
 	formatConversion,
 	CONVERSION_REGEX,
 } from "../utils/conversion";
-
-type EditorMode = "source" | "live-preview";
+import { MarkdownView } from "obsidian";
 
 class ConversionWidget extends WidgetType {
 	constructor(
@@ -45,25 +44,26 @@ export function createUnitConversionExtension(plugin: UnitConverterPlugin) {
 	return ViewPlugin.fromClass(
 		class {
 			decorations: DecorationSet;
-			currentEditorMode: EditorMode = "source";
+			isLivePreview: boolean = false;
 
 			constructor(view: EditorView) {
-				this.currentEditorMode = this.detectEditorMode(view);
+				this.isLivePreview = this.detectEditorMode();
 				this.decorations = this.buildDecorations(view);
 			}
 
-			detectEditorMode(view: EditorView): EditorMode {
-				const editorElement = view.dom.closest(
-					".markdown-source-view.mod-cm6"
-				);
-				return editorElement?.classList.contains("is-live-preview")
-					? "live-preview"
-					: "source";
+			detectEditorMode(): boolean {
+				const view =
+					plugin.app.workspace.getActiveViewOfType(MarkdownView);
+
+				if (!view) return false;
+
+				const currentMode = view.currentMode;
+				return "sourceMode" in currentMode && !currentMode.sourceMode;
 			}
 
 			update(update: ViewUpdate) {
-				const newMode = this.detectEditorMode(update.view);
-				const modeChanged = newMode !== this.currentEditorMode;
+				const newMode = this.detectEditorMode();
+				const modeChanged = newMode !== this.isLivePreview;
 
 				if (
 					update.docChanged ||
@@ -71,16 +71,13 @@ export function createUnitConversionExtension(plugin: UnitConverterPlugin) {
 					update.viewportChanged ||
 					modeChanged
 				) {
-					this.currentEditorMode = newMode;
+					this.isLivePreview = newMode;
 					this.decorations = this.buildDecorations(update.view);
 				}
 			}
 
 			buildDecorations(view: EditorView) {
-				if (
-					!plugin.settings.livePreviewInEditMode ||
-					this.currentEditorMode === "source"
-				) {
+				if (!this.isLivePreview) {
 					return Decoration.none;
 				}
 
