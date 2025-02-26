@@ -13,6 +13,7 @@ import {
 	convertValue,
 	formatConversion,
 	CONVERSION_REGEX,
+	parseFractionalNotation,
 } from "../utils/conversion";
 import { MarkdownView } from "obsidian";
 
@@ -97,11 +98,15 @@ export function createUnitConversionExtension(plugin: UnitConverterPlugin) {
 
 						// Apply decoration if we're not on the active line
 						if (lineAtMatch !== cursorLine) {
-							const value = parseFloat(match[1]);
+							const valueStr = match[1];
 							const fromUnit = match[2] as Unit;
 							const toUnit = match[3] as Unit;
 
 							try {
+								const value = parseFractionalNotation(
+									valueStr,
+									fromUnit
+								);
 								convertValue(value, fromUnit, toUnit);
 
 								builder.add(

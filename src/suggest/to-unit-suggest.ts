@@ -1,4 +1,4 @@
-import UnitConverterPlugin from "src/editor/post-processor";
+import UnitConverterPlugin from "src/main";
 import {
 	Editor,
 	EditorPosition,
@@ -26,7 +26,7 @@ export default class DestinationUnitSuggest extends EditorSuggest<DestinationUni
 		const subString = line.substring(0, cursor.ch);
 
 		// Match pattern [value unit|
-		const match = subString.match(/\[([\d.]+)([a-zA-Z0-9\-/]+)\|$/);
+		const match = subString.match(/\[([\d.\-/]+)([a-zA-Z0-9\-/]+)\|$/);
 		if (!match) return null;
 
 		const [, , fromUnit] = match;

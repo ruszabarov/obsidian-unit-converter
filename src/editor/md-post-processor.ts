@@ -1,7 +1,11 @@
 import { MarkdownPostProcessor } from "obsidian";
 import { Unit } from "convert-units";
 import { UnitConverterSettings } from "../settings";
-import { CONVERSION_REGEX, formatConversion } from "../utils/conversion";
+import {
+	CONVERSION_REGEX,
+	formatConversion,
+	parseFractionalNotation,
+} from "../utils/conversion";
 
 export function createMarkdownPostProcessor(
 	settings: UnitConverterSettings
@@ -30,7 +34,7 @@ export function createMarkdownPostProcessor(
 					fromUnit: Unit,
 					toUnit: Unit
 				) => {
-					const value = parseFloat(valueStr);
+					const value = parseFractionalNotation(valueStr, fromUnit);
 					return formatConversion(
 						value,
 						fromUnit,
