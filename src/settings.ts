@@ -4,13 +4,11 @@ import UnitConverterPlugin from "./main";
 export interface UnitConverterSettings {
 	useDescriptiveNames: boolean;
 	isAutosuggestEnabled: boolean;
-	livePreviewInEditMode: boolean;
 }
 
 export const DEFAULT_SETTINGS: UnitConverterSettings = {
 	useDescriptiveNames: false,
 	isAutosuggestEnabled: true,
-	livePreviewInEditMode: true,
 };
 
 export class UnitConverterSettingTab extends PluginSettingTab {
@@ -48,21 +46,6 @@ export class UnitConverterSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.isAutosuggestEnabled = value;
 						await this.plugin.saveSettings();
-					})
-			);
-
-		new Setting(containerEl)
-			.setName("Live Preview Conversions")
-			.setDesc(
-				"Show converted units in Live Preview mode only (not in Source mode)"
-			)
-			.addToggle((toggle) =>
-				toggle
-					.setValue(this.plugin.settings.livePreviewInEditMode)
-					.onChange(async (value) => {
-						this.plugin.settings.livePreviewInEditMode = value;
-						await this.plugin.saveSettings();
-						this.plugin.refreshEditorExtensions();
 					})
 			);
 	}

@@ -9,11 +9,9 @@ import DestinationUnitSuggest from "./suggest/to-unit-suggest";
 import { ConversionModal } from "./modal/conversion-modal";
 import { createUnitConversionExtension } from "./editor/extension";
 import { createMarkdownPostProcessor } from "./editor/md-post-processor";
-import { Extension } from "@codemirror/state";
 
 export default class UnitConverterPlugin extends Plugin {
 	settings: UnitConverterSettings;
-	private editorExtension: Extension;
 
 	async onload() {
 		await this.loadSettings();
@@ -24,15 +22,11 @@ export default class UnitConverterPlugin extends Plugin {
 			this.registerEditorSuggest(new DestinationUnitSuggest(this));
 		}
 
-		this.registerEvent(
-			this.app.workspace.on("layout-change", () => {
-				this.refreshEditorExtensions();
-			})
-		);
-
 		this.registerMarkdownPostProcessor(
 			createMarkdownPostProcessor(this.settings)
 		);
+
+		this.registerEditorExtension(createUnitConversionExtension(this));
 
 		this.addCommand({
 			id: "convert-units",
@@ -47,20 +41,6 @@ export default class UnitConverterPlugin extends Plugin {
 				).open();
 			},
 		});
-
-		this.refreshEditorExtensions();
-	}
-
-	refreshEditorExtensions() {
-		// Unregister previous extension if it exists
-		if (this.editorExtension) {
-			this.app.workspace.updateOptions();
-		}
-
-		if (this.settings.livePreviewInEditMode) {
-			this.editorExtension = createUnitConversionExtension(this);
-			this.registerEditorExtension(this.editorExtension);
-		}
 	}
 
 	async loadSettings() {
@@ -73,6 +53,5 @@ export default class UnitConverterPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		this.refreshEditorExtensions();
 	}
 }
