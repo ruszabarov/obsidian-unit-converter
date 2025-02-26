@@ -21,7 +21,10 @@ class ConversionWidget extends WidgetType {
 		private readonly value: number,
 		private readonly fromUnit: Unit,
 		private readonly toUnit: Unit,
-		private readonly plugin: UnitConverterPlugin
+		private readonly plugin: UnitConverterPlugin,
+		private readonly view: EditorView,
+		private readonly from: number,
+		private readonly to: number
 	) {
 		super();
 	}
@@ -35,6 +38,21 @@ class ConversionWidget extends WidgetType {
 			this.toUnit,
 			this.plugin.settings.useDescriptiveNames
 		);
+
+		span.style.cursor = "pointer";
+
+		// Make the widget selectable on click
+		span.addEventListener("click", (e) => {
+			e.preventDefault();
+
+			// Set selection to cover the entire text
+			this.view.dispatch({
+				selection: {
+					anchor: this.from + 1,
+					head: this.to - 1,
+				},
+			});
+		});
 
 		return span;
 	}
@@ -112,7 +130,10 @@ export function createUnitConversionExtension(plugin: UnitConverterPlugin) {
 											value,
 											fromUnit,
 											toUnit,
-											plugin
+											plugin,
+											view,
+											start,
+											end
 										),
 									})
 								);
