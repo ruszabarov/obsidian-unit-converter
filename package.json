@@ -32,5 +32,10 @@
 	},
 	"dependencies": {
 		"convert-units": "^2.3.4"
+	},
+	"pnpm": {
+		"patchedDependencies": {
+			"@types/convert-units": "patches/@types__convert-units.patch"
+		}
 	}
 }

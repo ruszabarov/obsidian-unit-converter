@@ -8,6 +8,11 @@ export function convertValue(
 	fromUnit: Unit,
 	toUnit: Unit
 ): number {
+	// Special handling for our custom fractional units
+	if (toUnit === "inf" || toUnit === "ftf") {
+		// Convert to inches first, then we'll format it later
+		return convert(value).from(fromUnit).to("in");
+	}
 	return convert(value).from(fromUnit).to(toUnit);
 }
 
@@ -96,6 +101,66 @@ function evaluateFraction(fraction: string): number {
 }
 
 /**
+ * Converts a decimal value to a fraction string based on the specified denominator
+ * @param decimal The decimal value to convert
+ * @param maxDenominator The maximum denominator to use (8, 16, 32, 64, etc.)
+ * @returns A simplified fraction string (e.g., "1/2", "3/4")
+ */
+export function decimalToFraction(
+	decimal: number,
+	maxDenominator: number
+): string {
+	if (decimal === 0) return "0";
+	if (Number.isInteger(decimal)) return decimal.toString();
+
+	// Get just the decimal part
+	const wholePart = Math.floor(Math.abs(decimal));
+	const decimalPart = Math.abs(decimal) - wholePart;
+
+	// Round to the nearest fraction based on denominator
+	const numerator = Math.round(decimalPart * maxDenominator);
+	const denominator = maxDenominator;
+
+	// Simplify the fraction
+	const gcd = findGCD(numerator, denominator);
+	const simplifiedNumerator = numerator / gcd;
+	const simplifiedDenominator = denominator / gcd;
+
+	// Return the appropriate format
+	if (simplifiedNumerator === 0) {
+		return wholePart.toString();
+	} else if (wholePart === 0) {
+		return `${simplifiedNumerator}/${simplifiedDenominator}`;
+	} else {
+		return `${wholePart}-${simplifiedNumerator}/${simplifiedDenominator}`;
+	}
+}
+
+/**
+ * Finds the greatest common divisor of two numbers
+ */
+function findGCD(a: number, b: number): number {
+	return b === 0 ? a : findGCD(b, a % b);
+}
+
+/**
+ * Converts decimal inches to feet and inches with fractions
+ */
+function inchesToFeetInches(inches: number, maxDenominator: number): string {
+	const feet = Math.floor(inches / 12);
+	const remainingInches = inches % 12;
+
+	if (feet === 0) {
+		return `${decimalToFraction(remainingInches, maxDenominator)} in`;
+	} else if (remainingInches === 0) {
+		return `${feet} ft`;
+	} else {
+		const inchFraction = decimalToFraction(remainingInches, maxDenominator);
+		return `${feet} ${inchFraction} ft-in`;
+	}
+}
+
+/**
  * Performs unit conversion and returns the formatted result
  */
 export function formatConversion(
@@ -103,10 +168,25 @@ export function formatConversion(
 	fromUnit: Unit,
 	toUnit: Unit,
 	useDescriptiveNames: boolean,
-	precision: number = 2
+	precision: number = 2,
+	fractionDenominator: number = 32
 ): string {
 	try {
 		const convertedValue = convertValue(value, fromUnit, toUnit);
+
+		// Handle our custom fractional formats
+		if (toUnit === "inf") {
+			// Format as inches with fractions
+			return `${decimalToFraction(
+				convertedValue,
+				fractionDenominator
+			)} in`;
+		} else if (toUnit === "ftf") {
+			// Format as feet-inches with fractions
+			return inchesToFeetInches(convertedValue, fractionDenominator);
+		}
+
+		// Regular formatting for standard units
 		const displayUnit = getDisplayUnit(
 			convertedValue,
 			toUnit,

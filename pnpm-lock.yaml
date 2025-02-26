@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@types/convert-units':
+    hash: 6c2114efb511bde0a464b944b57f0f70f688111f1449cc42bee008f0d4bee8a5
+    path: patches/@types__convert-units.patch
+
 importers:
 
   .:
@@ -23,7 +28,7 @@ importers:
         version: 9.21.0
       '@types/convert-units':
         specifier: ^2.3.11
-        version: 2.3.11
+        version: 2.3.11(patch_hash=6c2114efb511bde0a464b944b57f0f70f688111f1449cc42bee008f0d4bee8a5)
       '@types/node':
         specifier: ^22.13.1
         version: 22.13.1
@@ -897,7 +902,7 @@ snapshots:
     dependencies:
       '@types/tern': 0.23.9
 
-  '@types/convert-units@2.3.11': {}
+  '@types/convert-units@2.3.11(patch_hash=6c2114efb511bde0a464b944b57f0f70f688111f1449cc42bee008f0d4bee8a5)': {}
 
   '@types/estree@1.0.6': {}
 

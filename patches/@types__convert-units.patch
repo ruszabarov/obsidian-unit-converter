@@ -1,0 +1,11 @@
+diff --git a/index.d.ts b/index.d.ts
+index 9460a828a4760d5b3939321b5c8ded8ed7ae7fc6..79622bed57bfaa1c39ec158e01006543888d52f1 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -1,5 +1,5 @@
+ declare namespace convert {
+-    type Distance = "mm" | "cm" | "m" | "km" | "in" | "ft-us" | "ft" | "yd" | "mi"; // Distance
++    type Distance = "mm" | "cm" | "m" | "km" | "in" | "ft-us" | "ft" | "yd" | "mi" | "ftf" | "inf"; // Distance
+     type Area = "mm2" | "cm2" | "m2" | "ha" | "km2" | "in2" | "ft2" | "ac" | "mi2"; // Area
+     type Mass = "mcg" | "mg" | "g" | "kg" | "oz" | "lb" | "mt" | "t"; // Mass
+     type Volume =
