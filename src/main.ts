@@ -26,7 +26,6 @@ export default class UnitConverterPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on("layout-change", () => {
-				console.log("layout-change");
 				this.refreshEditorExtensions();
 			})
 		);
