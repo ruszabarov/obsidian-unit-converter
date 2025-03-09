@@ -78,14 +78,26 @@ export default class DestinationUnitSuggest extends EditorSuggest<DestinationUni
 		if (!this.context) return;
 
 		const { editor, start } = this.context;
-		const endPos = {
-			line: start.line,
-			ch: start.ch + value.value.length,
-		};
+
+		// Insert the selected unit
 		editor.replaceRange(value.value, start, {
 			line: start.line,
 			ch: start.ch,
 		});
-		editor.setCursor(endPos);
+
+		// Position cursor after the inserted unit
+		const cursorPos = {
+			line: start.line,
+			ch: start.ch + value.value.length,
+		};
+
+		// Check if the next character is a closing bracket
+		const line = editor.getLine(cursorPos.line);
+		if (line.length > cursorPos.ch && line[cursorPos.ch] === "]") {
+			// Move cursor outside the closing bracket
+			cursorPos.ch += 1;
+		}
+
+		editor.setCursor(cursorPos);
 	}
 }
