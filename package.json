@@ -22,7 +22,7 @@
 		"@typescript-eslint/eslint-plugin": "^8.31.0",
 		"@typescript-eslint/parser": "^8.29.1",
 		"builtin-modules": "5.0.0",
-		"eslint": "^9.23.0",
+		"eslint": "^9.25.1",
 		"globals": "^16.0.0",
 		"obsidian": "latest",
 		"rolldown": "^1.0.0-beta.8",
