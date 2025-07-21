@@ -22,8 +22,8 @@ importers:
         specifier: ^9.31.0
         version: 9.31.0
       '@types/convert-units':
-        specifier: ^2.3.11
-        version: 2.3.11
+        specifier: ^2.3.12
+        version: 2.3.12
       '@types/node':
         specifier: ^22.15.19
         version: 22.15.19
@@ -220,8 +220,8 @@ packages:
   '@types/codemirror@5.60.8':
     resolution: {integrity: sha512-VjFgDF/eB+Aklcy15TtOTLQeMjTo07k7KAjql8OK5Dirr7a6sJY4T1uVBDuTVG9VEmn1uUsohOpYnVfgC6/jyw==}
 
-  '@types/convert-units@2.3.11':
-    resolution: {integrity: sha512-ld2+nLOUHMOFThcXQEcVgzoNVjjyBHp/dD5G00nS5TOfgDqIcAyX1T8xR2C162qjfEIby3AoxwwB1Vl9mLdvsQ==}
+  '@types/convert-units@2.3.12':
+    resolution: {integrity: sha512-4EaowCOJMy8Cb2nB8XSN61U82VV4qFsFYY2WhKIwXy936aBTp2yWKvMpTCt1g76MDmd+DmVi9YxKSYVrfCQ/yw==}
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
@@ -988,7 +988,7 @@ snapshots:
     dependencies:
       '@types/tern': 0.23.9
 
-  '@types/convert-units@2.3.11': {}
+  '@types/convert-units@2.3.12': {}
 
   '@types/estree@1.0.8': {}
 
