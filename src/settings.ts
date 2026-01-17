@@ -4,11 +4,13 @@ import UnitConverterPlugin from "./main";
 export interface UnitConverterSettings {
 	useDescriptiveNames: boolean;
 	isAutosuggestEnabled: boolean;
+	showOriginalUnits: boolean;
 }
 
 export const DEFAULT_SETTINGS: UnitConverterSettings = {
 	useDescriptiveNames: false,
 	isAutosuggestEnabled: true,
+	showOriginalUnits: false,
 };
 
 export class UnitConverterSettingTab extends PluginSettingTab {
@@ -45,6 +47,18 @@ export class UnitConverterSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.isAutosuggestEnabled)
 					.onChange(async (value) => {
 						this.plugin.settings.isAutosuggestEnabled = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Show Original Units")
+			.setDesc("Enable to display the original entered value in addition to the converted one")
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.showOriginalUnits)
+					.onChange(async (value) => {
+						this.plugin.settings.showOriginalUnits = value;
 						await this.plugin.saveSettings();
 					})
 			);

@@ -35,7 +35,8 @@ export function createMarkdownPostProcessor(
 						value,
 						fromUnit,
 						toUnit,
-						settings.useDescriptiveNames
+						settings.useDescriptiveNames,
+						settings.showOriginalUnits
 					);
 				}
 			);
