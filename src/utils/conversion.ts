@@ -56,13 +56,11 @@ export function formatConversion(
 			useDescriptiveNames
 		);
 
-		if (showOriginalUnits) {
-			const originalUnit = getDisplayUnit(value,fromUnit,useDescriptiveNames);
-			return `${value} ${originalUnit} (${convertedValue.toFixed(precision)} ${displayUnit})`;
-		}
-		else {
+		if (!showOriginalUnits) {
 			return `${convertedValue.toFixed(precision)} ${displayUnit}`;
 		}
+		const originalUnit = getDisplayUnit(value,fromUnit,useDescriptiveNames);
+		return `${value} ${originalUnit} (${convertedValue.toFixed(precision)} ${displayUnit})`;
 	} catch (e) {
 		console.error("Conversion error:", e);
 		return `[${value}${fromUnit}|${toUnit}]`; // Return original format on error
