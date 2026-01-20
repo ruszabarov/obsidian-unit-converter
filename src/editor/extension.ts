@@ -36,7 +36,8 @@ class ConversionWidget extends WidgetType {
 			this.value,
 			this.fromUnit,
 			this.toUnit,
-			this.plugin.settings.useDescriptiveNames
+			this.plugin.settings.useDescriptiveNames,
+			this.plugin.settings.showOriginalUnits
 		);
 
 		span.style.cursor = "pointer";

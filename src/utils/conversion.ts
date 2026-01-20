@@ -45,6 +45,7 @@ export function formatConversion(
 	fromUnit: Unit,
 	toUnit: Unit,
 	useDescriptiveNames: boolean,
+	showOriginalUnits: boolean,
 	precision: number = 2
 ): string {
 	try {
@@ -54,7 +55,12 @@ export function formatConversion(
 			toUnit,
 			useDescriptiveNames
 		);
-		return `${convertedValue.toFixed(precision)} ${displayUnit}`;
+
+		if (!showOriginalUnits) {
+			return `${convertedValue.toFixed(precision)} ${displayUnit}`;
+		}
+		const originalUnit = getDisplayUnit(value,fromUnit,useDescriptiveNames);
+		return `${value} ${originalUnit} (${convertedValue.toFixed(precision)} ${displayUnit})`;
 	} catch (e) {
 		console.error("Conversion error:", e);
 		return `[${value}${fromUnit}|${toUnit}]`; // Return original format on error
