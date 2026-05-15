@@ -6,21 +6,38 @@ on:
             - master
     workflow_call:
 
+permissions:
+    contents: read
+
+env:
+    NODE_VERSION: "26.x"
+    PNPM_VERSION: "11"
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
 jobs:
     build:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04-arm
         steps:
-            - uses: actions/checkout@v4
-
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
+            - name: Checkout
+              uses: actions/checkout@v6
               with:
-                  node-version: "20.x"
+                  persist-credentials: false
 
             - name: Setup pnpm
-              uses: pnpm/action-setup@v2
+              uses: pnpm/action-setup@v6
               with:
-                  version: latest
+                  version: ${{ env.PNPM_VERSION }}
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  check-latest: true
+                  cache: pnpm
+                  cache-dependency-path: pnpm-lock.yaml
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
