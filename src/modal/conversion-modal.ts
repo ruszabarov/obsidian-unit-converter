@@ -1,9 +1,6 @@
 import { App, Modal, Setting, DropdownComponent } from "obsidian";
 import type { UnitConverterSettings } from "../settings";
-import {
-	listMeasures,
-	listUnits,
-} from "../utils/conversion";
+import { listMeasures, listUnits } from "../utils/conversion";
 import type { MeasureCode, UnitCode } from "../utils/conversion";
 
 export class ConversionModal extends Modal {
@@ -17,7 +14,7 @@ export class ConversionModal extends Modal {
 	constructor(
 		app: App,
 		private readonly settings: UnitConverterSettings,
-		onSubmit: (value: number, fromUnit: UnitCode, toUnit: UnitCode) => void
+		onSubmit: (value: number, fromUnit: UnitCode, toUnit: UnitCode) => void,
 	) {
 		super(app);
 		this.onSubmit = onSubmit;
@@ -34,10 +31,7 @@ export class ConversionModal extends Modal {
 		const compatibleUnits = this.getCompatibleUnits(measure);
 
 		compatibleUnits.forEach((unit) => {
-			this.fromUnitDropdown.addOption(
-				unit.abbr,
-				unit.plural.toLowerCase()
-			);
+			this.fromUnitDropdown.addOption(unit.abbr, unit.plural.toLowerCase());
 		});
 
 		this.fromUnitDropdown.setValue(compatibleUnits[0].abbr);
@@ -63,10 +57,7 @@ export class ConversionModal extends Modal {
 		contentEl.createEl("h2", { text: "Convert units" });
 
 		new Setting(contentEl).setName("Value").addText((text) => {
-			text.setPlaceholder("Enter a number").inputEl.setAttribute(
-				"type",
-				"number"
-			);
+			text.setPlaceholder("Enter a number").inputEl.setAttribute("type", "number");
 			text.onChange((value) => {
 				this.value = parseFloat(value);
 			});
@@ -79,41 +70,34 @@ export class ConversionModal extends Modal {
 			cls: "measure-from-container",
 		});
 
-		new Setting(measureFromContainer)
-			.setName("Measure")
-			.addDropdown((dropdown) => {
-				measures.forEach((measure) => {
-					dropdown.addOption(measure, measure);
-				});
-
-				dropdown.setValue(initialMeasure);
-				dropdown.onChange((measure) => {
-					const selectedMeasure = measure as MeasureCode;
-					this.updateFromUnitDropdown(selectedMeasure);
-					this.updateToUnitDropdown(selectedMeasure);
-				});
+		new Setting(measureFromContainer).setName("Measure").addDropdown((dropdown) => {
+			measures.forEach((measure) => {
+				dropdown.addOption(measure, measure);
 			});
 
-		new Setting(measureFromContainer)
-			.setName("From Unit")
-			.addDropdown((dropdown) => {
-				this.fromUnitDropdown = dropdown;
-				const compatibleUnits = this.getCompatibleUnits(initialMeasure);
-
-				compatibleUnits.forEach((unit) => {
-					dropdown.addOption(
-						unit.abbr,
-						unit.plural.toLowerCase()
-					);
-				});
-
-				dropdown.setValue(compatibleUnits[0].abbr);
-				this.fromUnit = compatibleUnits[0].abbr;
-
-				dropdown.onChange((value) => {
-					this.fromUnit = value;
-				});
+			dropdown.setValue(initialMeasure);
+			dropdown.onChange((measure) => {
+				const selectedMeasure = measure as MeasureCode;
+				this.updateFromUnitDropdown(selectedMeasure);
+				this.updateToUnitDropdown(selectedMeasure);
 			});
+		});
+
+		new Setting(measureFromContainer).setName("From Unit").addDropdown((dropdown) => {
+			this.fromUnitDropdown = dropdown;
+			const compatibleUnits = this.getCompatibleUnits(initialMeasure);
+
+			compatibleUnits.forEach((unit) => {
+				dropdown.addOption(unit.abbr, unit.plural.toLowerCase());
+			});
+
+			dropdown.setValue(compatibleUnits[0].abbr);
+			this.fromUnit = compatibleUnits[0].abbr;
+
+			dropdown.onChange((value) => {
+				this.fromUnit = value;
+			});
+		});
 
 		new Setting(contentEl).setName("To Unit").addDropdown((dropdown) => {
 			this.toUnitDropdown = dropdown;
@@ -136,15 +120,11 @@ export class ConversionModal extends Modal {
 				.setButtonText("Insert")
 				.setCta()
 				.onClick(() => {
-					if (
-						Number.isFinite(this.value) &&
-						this.fromUnit &&
-						this.toUnit
-					) {
+					if (Number.isFinite(this.value) && this.fromUnit && this.toUnit) {
 						this.onSubmit(this.value, this.fromUnit, this.toUnit);
 						this.close();
 					}
-				})
+				}),
 		);
 	}
 

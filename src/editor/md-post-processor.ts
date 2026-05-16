@@ -3,14 +3,10 @@ import type { UnitConverterSettings } from "../settings";
 import { CONVERSION_REGEX, formatConversion } from "../utils/conversion";
 
 export function createMarkdownPostProcessor(
-	settings: UnitConverterSettings
+	settings: UnitConverterSettings,
 ): MarkdownPostProcessor {
 	return (element: HTMLElement) => {
-		const walker = document.createTreeWalker(
-			element,
-			NodeFilter.SHOW_TEXT,
-			null
-		);
+		const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null);
 		let node = walker.nextNode();
 
 		while (node) {
@@ -23,12 +19,7 @@ export function createMarkdownPostProcessor(
 
 			const newText = text.replace(
 				CONVERSION_REGEX,
-				(
-					match: string,
-					valueStr: string,
-					fromUnit: string,
-					toUnit: string
-				) => {
+				(match: string, valueStr: string, fromUnit: string, toUnit: string) => {
 					const value = parseFloat(valueStr);
 					return formatConversion(
 						value,
@@ -36,9 +27,9 @@ export function createMarkdownPostProcessor(
 						toUnit,
 						settings.useDescriptiveNames,
 						settings.showOriginalUnits,
-						settings.customUnits
+						settings.customUnits,
 					);
-				}
+				},
 			);
 
 			if (newText !== text) {

@@ -1,14 +1,7 @@
 import { DropdownComponent, Notice, PluginSettingTab, Setting } from "obsidian";
 import UnitConverterPlugin from "./main";
-import {
-	listMeasures,
-	listUnits,
-	validateCustomUnit,
-} from "./utils/conversion";
-import type {
-	CustomUnitDefinition,
-	MeasureCode,
-} from "./utils/conversion";
+import { listMeasures, listUnits, validateCustomUnit } from "./utils/conversion";
+import type { CustomUnitDefinition, MeasureCode } from "./utils/conversion";
 
 export interface UnitConverterSettings {
 	useDescriptiveNames: boolean;
@@ -40,16 +33,14 @@ export class UnitConverterSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Use descriptive unit names")
-			.setDesc(
-				'Display full unit names (e.g., "kilometers" instead of "km")'
-			)
+			.setDesc('Display full unit names (e.g., "kilometers" instead of "km")')
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.useDescriptiveNames)
 					.onChange(async (value) => {
 						this.plugin.settings.useDescriptiveNames = value;
 						await this.plugin.saveSettings();
-					})
+					}),
 			);
 
 		new Setting(containerEl)
@@ -61,19 +52,19 @@ export class UnitConverterSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.isAutosuggestEnabled = value;
 						await this.plugin.saveSettings();
-					})
+					}),
 			);
 
 		new Setting(containerEl)
 			.setName("Show Original Units")
-			.setDesc("Enable to display the original entered value in addition to the converted one")
+			.setDesc(
+				"Enable to display the original entered value in addition to the converted one",
+			)
 			.addToggle((toggle) =>
-				toggle
-					.setValue(this.plugin.settings.showOriginalUnits)
-					.onChange(async (value) => {
-						this.plugin.settings.showOriginalUnits = value;
-						await this.plugin.saveSettings();
-					})
+				toggle.setValue(this.plugin.settings.showOriginalUnits).onChange(async (value) => {
+					this.plugin.settings.showOriginalUnits = value;
+					await this.plugin.saveSettings();
+				}),
 			);
 
 		this.renderCustomUnitsSection(containerEl);
@@ -123,10 +114,7 @@ export class UnitConverterSettingTab extends PluginSettingTab {
 		}
 	}
 
-	private renderCustomUnitRow(
-		containerEl: HTMLElement,
-		unit: CustomUnitDefinition
-	): void {
+	private renderCustomUnitRow(containerEl: HTMLElement, unit: CustomUnitDefinition): void {
 		if (this.editingCustomUnitAbbr === unit.abbr) {
 			this.renderCustomUnitForm(containerEl, unit);
 			return;
@@ -164,10 +152,9 @@ export class UnitConverterSettingTab extends PluginSettingTab {
 
 		const deleteButton = actionsEl.createEl("button", { text: "Delete" });
 		deleteButton.addEventListener("click", async () => {
-			this.plugin.settings.customUnits =
-				this.plugin.settings.customUnits.filter(
-					(customUnit) => customUnit.abbr !== unit.abbr
-				);
+			this.plugin.settings.customUnits = this.plugin.settings.customUnits.filter(
+				(customUnit) => customUnit.abbr !== unit.abbr,
+			);
 			await this.plugin.saveSettings();
 			this.display();
 		});
@@ -175,13 +162,12 @@ export class UnitConverterSettingTab extends PluginSettingTab {
 
 	private renderCustomUnitForm(
 		containerEl: HTMLElement,
-		existingUnit?: CustomUnitDefinition
+		existingUnit?: CustomUnitDefinition,
 	): void {
 		const measures = listMeasures();
 		const initialMeasure = existingUnit?.measure ?? measures[0];
 		const initialAnchor =
-			existingUnit?.anchorUnit ??
-			this.getFirstBuiltInUnitForMeasure(initialMeasure);
+			existingUnit?.anchorUnit ?? this.getFirstBuiltInUnitForMeasure(initialMeasure);
 		const draft: CustomUnitDefinition = {
 			abbr: existingUnit?.abbr ?? "",
 			singular: existingUnit?.singular ?? "",
@@ -227,8 +213,7 @@ export class UnitConverterSettingTab extends PluginSettingTab {
 			dropdown.onChange((value) => {
 				const selectedMeasure = value as MeasureCode;
 				draft.measure = selectedMeasure;
-				draft.anchorUnit =
-					this.getFirstBuiltInUnitForMeasure(selectedMeasure);
+				draft.anchorUnit = this.getFirstBuiltInUnitForMeasure(selectedMeasure);
 				if (anchorDropdown) {
 					this.populateAnchorDropdown(anchorDropdown, draft);
 				}
@@ -270,7 +255,7 @@ export class UnitConverterSettingTab extends PluginSettingTab {
 						const validation = validateCustomUnit(
 							normalizedDraft,
 							this.plugin.settings.customUnits,
-							existingUnit?.abbr
+							existingUnit?.abbr,
 						);
 
 						if (!validation.isValid) {
@@ -279,12 +264,10 @@ export class UnitConverterSettingTab extends PluginSettingTab {
 						}
 
 						if (existingUnit) {
-							this.plugin.settings.customUnits =
-								this.plugin.settings.customUnits.map((unit) =>
-									unit.abbr === existingUnit.abbr
-										? normalizedDraft
-										: unit
-								);
+							this.plugin.settings.customUnits = this.plugin.settings.customUnits.map(
+								(unit) =>
+									unit.abbr === existingUnit.abbr ? normalizedDraft : unit,
+							);
 						} else {
 							this.plugin.settings.customUnits = [
 								...this.plugin.settings.customUnits,
@@ -308,22 +291,14 @@ export class UnitConverterSettingTab extends PluginSettingTab {
 			});
 	}
 
-	private populateAnchorDropdown(
-		dropdown: DropdownComponent,
-		draft: CustomUnitDefinition
-	): void {
+	private populateAnchorDropdown(dropdown: DropdownComponent, draft: CustomUnitDefinition): void {
 		dropdown.selectEl.empty();
 		const units = listUnits(draft.measure).filter((unit) => !unit.isCustom);
 		units.forEach((unit) =>
-			dropdown.addOption(
-				unit.abbr,
-				`${unit.plural.toLowerCase()} (${unit.abbr})`
-			)
+			dropdown.addOption(unit.abbr, `${unit.plural.toLowerCase()} (${unit.abbr})`),
 		);
 
-		const hasCurrentUnit = units.some(
-			(unit) => unit.abbr === draft.anchorUnit
-		);
+		const hasCurrentUnit = units.some((unit) => unit.abbr === draft.anchorUnit);
 		if (!hasCurrentUnit) {
 			draft.anchorUnit = units[0]?.abbr ?? "";
 		}
@@ -335,9 +310,7 @@ export class UnitConverterSettingTab extends PluginSettingTab {
 		return listUnits(measure).find((unit) => !unit.isCustom)?.abbr ?? "";
 	}
 
-	private normalizeCustomUnit(
-		unit: CustomUnitDefinition
-	): CustomUnitDefinition {
+	private normalizeCustomUnit(unit: CustomUnitDefinition): CustomUnitDefinition {
 		return {
 			abbr: unit.abbr.trim(),
 			singular: unit.singular.trim(),

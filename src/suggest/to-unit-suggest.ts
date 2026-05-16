@@ -18,26 +18,19 @@ export default class DestinationUnitSuggest extends EditorSuggest<DestinationUni
 		super(plugin.app);
 	}
 
-	onTrigger(
-		cursor: EditorPosition,
-		editor: Editor
-	): EditorSuggestTriggerInfo | null {
+	onTrigger(cursor: EditorPosition, editor: Editor): EditorSuggestTriggerInfo | null {
 		const line = editor.getLine(cursor.line);
 		const subString = line.substring(0, cursor.ch);
 
 		// Match pattern [value unit| or [value unit|text
-		const match = subString.match(
-			/\[([\d.]+)([a-zA-Z0-9\-/]+)\|([a-zA-Z0-9-]*)/
-		);
+		const match = subString.match(/\[([\d.]+)([a-zA-Z0-9\-/]+)\|([a-zA-Z0-9-]*)/);
 		if (!match) return null;
 
 		const [, , fromUnit] = match;
 
 		if (
 			!isBuiltInUnit(fromUnit) &&
-			!this.plugin.settings.customUnits.some(
-				(unit) => unit.abbr === fromUnit
-			)
+			!this.plugin.settings.customUnits.some((unit) => unit.abbr === fromUnit)
 		) {
 			return null;
 		}
@@ -62,14 +55,9 @@ export default class DestinationUnitSuggest extends EditorSuggest<DestinationUni
 		try {
 			// Get the text after the pipe
 			const line = context.editor.getLine(context.start.line);
-			const toUnitPartial = line
-				.substring(context.start.ch, context.end.ch)
-				.toLowerCase();
+			const toUnitPartial = line.substring(context.start.ch, context.end.ch).toLowerCase();
 
-			const possibilities = getCompatibleUnits(
-				fromUnit,
-				this.plugin.settings.customUnits
-			);
+			const possibilities = getCompatibleUnits(fromUnit, this.plugin.settings.customUnits);
 
 			return possibilities
 				.map((unit) => {
@@ -80,10 +68,8 @@ export default class DestinationUnitSuggest extends EditorSuggest<DestinationUni
 				})
 				.filter(
 					(suggestion) =>
-						suggestion.label
-							.toLowerCase()
-							.includes(toUnitPartial) ||
-						suggestion.value.toLowerCase().includes(toUnitPartial)
+						suggestion.label.toLowerCase().includes(toUnitPartial) ||
+						suggestion.value.toLowerCase().includes(toUnitPartial),
 				);
 		} catch {
 			return [];

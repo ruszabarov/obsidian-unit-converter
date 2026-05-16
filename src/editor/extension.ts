@@ -8,11 +8,7 @@ import {
 } from "@codemirror/view";
 import { RangeSetBuilder } from "@codemirror/state";
 import UnitConverterPlugin from "../main";
-import {
-	convertValue,
-	formatConversion,
-	CONVERSION_REGEX,
-} from "../utils/conversion";
+import { convertValue, formatConversion, CONVERSION_REGEX } from "../utils/conversion";
 import type { UnitCode } from "../utils/conversion";
 import { MarkdownView } from "obsidian";
 
@@ -24,7 +20,7 @@ class ConversionWidget extends WidgetType {
 		private readonly plugin: UnitConverterPlugin,
 		private readonly view: EditorView,
 		private readonly from: number,
-		private readonly to: number
+		private readonly to: number,
 	) {
 		super();
 	}
@@ -38,7 +34,7 @@ class ConversionWidget extends WidgetType {
 			this.toUnit,
 			this.plugin.settings.useDescriptiveNames,
 			this.plugin.settings.showOriginalUnits,
-			this.plugin.settings.customUnits
+			this.plugin.settings.customUnits,
 		);
 
 		span.style.cursor = "pointer";
@@ -72,8 +68,7 @@ export function createUnitConversionExtension(plugin: UnitConverterPlugin) {
 			}
 
 			detectEditorMode(): boolean {
-				const view =
-					plugin.app.workspace.getActiveViewOfType(MarkdownView);
+				const view = plugin.app.workspace.getActiveViewOfType(MarkdownView);
 
 				if (!view) return false;
 
@@ -122,12 +117,7 @@ export function createUnitConversionExtension(plugin: UnitConverterPlugin) {
 							const toUnit = match[3];
 
 							try {
-								convertValue(
-									value,
-									fromUnit,
-									toUnit,
-									plugin.settings.customUnits
-								);
+								convertValue(value, fromUnit, toUnit, plugin.settings.customUnits);
 
 								builder.add(
 									start,
@@ -140,9 +130,9 @@ export function createUnitConversionExtension(plugin: UnitConverterPlugin) {
 											plugin,
 											view,
 											start,
-											end
+											end,
 										),
-									})
+									}),
 								);
 							} catch (e) {
 								console.debug("Invalid conversion:", e);
@@ -156,6 +146,6 @@ export function createUnitConversionExtension(plugin: UnitConverterPlugin) {
 		},
 		{
 			decorations: (v) => v.decorations,
-		}
+		},
 	);
 }

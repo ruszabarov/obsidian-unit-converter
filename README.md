@@ -13,8 +13,8 @@ Use the following syntax within your notes to perform inline conversion:
 
 ## Features
 
--   [Autosuggest](#autosuggest)
--   [Convert units command](#convert-units-command)
+- [Autosuggest](#autosuggest)
+- [Convert units command](#convert-units-command)
 
 ### Autosuggest
 

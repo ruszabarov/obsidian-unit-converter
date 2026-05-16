@@ -31,7 +31,7 @@ const UNIT_CODE_REGEX = /^[a-zA-Z0-9\-/]+$/;
 
 function getCustomUnit(
 	unit: UnitCode,
-	customUnits: CustomUnitDefinition[] = []
+	customUnits: CustomUnitDefinition[] = [],
 ): CustomUnitDefinition | undefined {
 	return customUnits.find((customUnit) => customUnit.abbr === unit);
 }
@@ -47,7 +47,7 @@ export function isBuiltInUnit(unit: UnitCode): boolean {
 
 export function describeUnit(
 	unit: UnitCode,
-	customUnits: CustomUnitDefinition[] = []
+	customUnits: CustomUnitDefinition[] = [],
 ): UnitDescription {
 	const customUnit = getCustomUnit(unit, customUnits);
 	if (customUnit) {
@@ -78,7 +78,7 @@ export function listMeasures(): MeasureCode[] {
 
 export function listUnits(
 	measure?: MeasureCode,
-	customUnits: CustomUnitDefinition[] = []
+	customUnits: CustomUnitDefinition[] = [],
 ): UnitDescription[] {
 	const builtInUnits = convert()
 		.list(measure)
@@ -107,7 +107,7 @@ export function listUnits(
 
 export function getCompatibleUnits(
 	unit: UnitCode,
-	customUnits: CustomUnitDefinition[] = []
+	customUnits: CustomUnitDefinition[] = [],
 ): UnitDescription[] {
 	const description = describeUnit(unit, customUnits);
 	return listUnits(description.measure, customUnits);
@@ -120,20 +120,22 @@ export function convertValue(
 	value: number,
 	fromUnit: UnitCode,
 	toUnit: UnitCode,
-	customUnits: CustomUnitDefinition[] = []
+	customUnits: CustomUnitDefinition[] = [],
 ): number {
 	const fromCustomUnit = getCustomUnit(fromUnit, customUnits);
 	const toCustomUnit = getCustomUnit(toUnit, customUnits);
 
 	if (!fromCustomUnit && !toCustomUnit) {
-		return convert(value).from(fromUnit as Unit).to(toUnit as Unit);
+		return convert(value)
+			.from(fromUnit as Unit)
+			.to(toUnit as Unit);
 	}
 
 	const fromDescription = describeUnit(fromUnit, customUnits);
 	const toDescription = describeUnit(toUnit, customUnits);
 	if (fromDescription.measure !== toDescription.measure) {
 		throw new Error(
-			`Cannot convert incompatible measures of ${fromDescription.measure} and ${toDescription.measure}`
+			`Cannot convert incompatible measures of ${fromDescription.measure} and ${toDescription.measure}`,
 		);
 	}
 
@@ -141,7 +143,9 @@ export function convertValue(
 	const anchorUnit = fromCustomUnit ? fromCustomUnit.anchorUnit : fromUnit;
 
 	if (!toCustomUnit) {
-		return convert(anchorValue).from(anchorUnit as Unit).to(toUnit as Unit);
+		return convert(anchorValue)
+			.from(anchorUnit as Unit)
+			.to(toUnit as Unit);
 	}
 
 	const valueInTargetAnchor = convert(anchorValue)
@@ -158,7 +162,7 @@ export function getDisplayUnit(
 	value: number,
 	unit: UnitCode,
 	useDescriptiveNames: boolean,
-	customUnits: CustomUnitDefinition[] = []
+	customUnits: CustomUnitDefinition[] = [],
 ): string {
 	if (!useDescriptiveNames) {
 		return unit.toString();
@@ -167,9 +171,7 @@ export function getDisplayUnit(
 	try {
 		const measure = describeUnit(unit, customUnits);
 		if (measure.plural) {
-			return (
-				value === 1 ? measure.singular : measure.plural
-			).toLowerCase();
+			return (value === 1 ? measure.singular : measure.plural).toLowerCase();
 		}
 	} catch (e) {
 		console.error("Error getting descriptive name:", e);
@@ -188,31 +190,21 @@ export function formatConversion(
 	useDescriptiveNames: boolean,
 	showOriginalUnits: boolean,
 	customUnits: CustomUnitDefinition[] = [],
-	precision: number = 2
+	precision: number = 2,
 ): string {
 	try {
-		const convertedValue = convertValue(
-			value,
-			fromUnit,
-			toUnit,
-			customUnits
-		);
+		const convertedValue = convertValue(value, fromUnit, toUnit, customUnits);
 		const displayUnit = getDisplayUnit(
 			convertedValue,
 			toUnit,
 			useDescriptiveNames,
-			customUnits
+			customUnits,
 		);
 
 		if (!showOriginalUnits) {
 			return `${convertedValue.toFixed(precision)} ${displayUnit}`;
 		}
-		const originalUnit = getDisplayUnit(
-			value,
-			fromUnit,
-			useDescriptiveNames,
-			customUnits
-		);
+		const originalUnit = getDisplayUnit(value, fromUnit, useDescriptiveNames, customUnits);
 		return `${value} ${originalUnit} (${convertedValue.toFixed(precision)} ${displayUnit})`;
 	} catch (e) {
 		console.error("Conversion error:", e);
@@ -223,7 +215,7 @@ export function formatConversion(
 export function validateCustomUnit(
 	unit: CustomUnitDefinition,
 	customUnits: CustomUnitDefinition[] = [],
-	originalAbbr?: UnitCode
+	originalAbbr?: UnitCode,
 ): CustomUnitValidationResult {
 	const abbr = unit.abbr.trim();
 	const singular = unit.singular.trim();
@@ -261,8 +253,7 @@ export function validateCustomUnit(
 	}
 
 	const duplicate = customUnits.some(
-		(customUnit) =>
-			customUnit.abbr === abbr && customUnit.abbr !== originalAbbr
+		(customUnit) => customUnit.abbr === abbr && customUnit.abbr !== originalAbbr,
 	);
 	if (duplicate) {
 		return {
@@ -285,5 +276,4 @@ export function validateCustomUnit(
 /**
  * Regular expression to match unit conversion syntax
  */
-export const CONVERSION_REGEX =
-	/\[([\d.]+)([a-zA-Z0-9\-/]+)\|([a-zA-Z0-9\-/]+)\]/g;
+export const CONVERSION_REGEX = /\[([\d.]+)([a-zA-Z0-9\-/]+)\|([a-zA-Z0-9\-/]+)\]/g;
