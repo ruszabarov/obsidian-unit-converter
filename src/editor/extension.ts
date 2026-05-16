@@ -7,20 +7,20 @@ import {
 	WidgetType,
 } from "@codemirror/view";
 import { RangeSetBuilder } from "@codemirror/state";
-import { Unit } from "convert-units";
 import UnitConverterPlugin from "../main";
 import {
 	convertValue,
 	formatConversion,
 	CONVERSION_REGEX,
 } from "../utils/conversion";
+import type { UnitCode } from "../utils/conversion";
 import { MarkdownView } from "obsidian";
 
 class ConversionWidget extends WidgetType {
 	constructor(
 		private readonly value: number,
-		private readonly fromUnit: Unit,
-		private readonly toUnit: Unit,
+		private readonly fromUnit: UnitCode,
+		private readonly toUnit: UnitCode,
 		private readonly plugin: UnitConverterPlugin,
 		private readonly view: EditorView,
 		private readonly from: number,
@@ -37,7 +37,8 @@ class ConversionWidget extends WidgetType {
 			this.fromUnit,
 			this.toUnit,
 			this.plugin.settings.useDescriptiveNames,
-			this.plugin.settings.showOriginalUnits
+			this.plugin.settings.showOriginalUnits,
+			this.plugin.settings.customUnits
 		);
 
 		span.style.cursor = "pointer";
@@ -117,11 +118,16 @@ export function createUnitConversionExtension(plugin: UnitConverterPlugin) {
 						// Apply decoration if we're not on the active line
 						if (lineAtMatch !== cursorLine) {
 							const value = parseFloat(match[1]);
-							const fromUnit = match[2] as Unit;
-							const toUnit = match[3] as Unit;
+							const fromUnit = match[2];
+							const toUnit = match[3];
 
 							try {
-								convertValue(value, fromUnit, toUnit);
+								convertValue(
+									value,
+									fromUnit,
+									toUnit,
+									plugin.settings.customUnits
+								);
 
 								builder.add(
 									start,

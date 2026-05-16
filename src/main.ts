@@ -1,5 +1,4 @@
 import { Plugin, Editor } from "obsidian";
-import { Unit } from "convert-units";
 import {
 	DEFAULT_SETTINGS,
 	UnitConverterSettings,
@@ -9,9 +8,13 @@ import DestinationUnitSuggest from "./suggest/to-unit-suggest";
 import { ConversionModal } from "./modal/conversion-modal";
 import { createUnitConversionExtension } from "./editor/extension";
 import { createMarkdownPostProcessor } from "./editor/md-post-processor";
+import type { UnitCode } from "./utils/conversion";
 
 export default class UnitConverterPlugin extends Plugin {
-	settings: UnitConverterSettings;
+	settings: UnitConverterSettings = {
+		...DEFAULT_SETTINGS,
+		customUnits: [],
+	};
 
 	async onload() {
 		await this.loadSettings();
@@ -34,7 +37,8 @@ export default class UnitConverterPlugin extends Plugin {
 			editorCallback: (editor: Editor) => {
 				new ConversionModal(
 					this.app,
-					(value: number, fromUnit: Unit, toUnit: Unit) => {
+					this.settings,
+					(value: number, fromUnit: UnitCode, toUnit: UnitCode) => {
 						const conversionString = `[${value}${fromUnit}|${toUnit}]`;
 						editor.replaceSelection(conversionString);
 					}
@@ -49,6 +53,7 @@ export default class UnitConverterPlugin extends Plugin {
 			DEFAULT_SETTINGS,
 			await this.loadData()
 		);
+		this.settings.customUnits = this.settings.customUnits ?? [];
 	}
 
 	async saveSettings() {

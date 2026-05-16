@@ -6,7 +6,7 @@ import {
 	EditorSuggestContext,
 	EditorSuggestTriggerInfo,
 } from "obsidian";
-import convert, { Unit } from "convert-units";
+import { getCompatibleUnits, isBuiltInUnit } from "../utils/conversion";
 
 interface DestinationUnitCompletion {
 	label: string;
@@ -14,7 +14,7 @@ interface DestinationUnitCompletion {
 }
 
 export default class DestinationUnitSuggest extends EditorSuggest<DestinationUnitCompletion> {
-	constructor(plugin: UnitConverterPlugin) {
+	constructor(private readonly plugin: UnitConverterPlugin) {
 		super(plugin.app);
 	}
 
@@ -33,27 +33,28 @@ export default class DestinationUnitSuggest extends EditorSuggest<DestinationUni
 
 		const [, , fromUnit] = match;
 
-		try {
-			// Verify if the fromUnit is valid
-			convert().from(fromUnit as Unit);
-
-			// Find the start position of the toUnit part (after the pipe)
-			const pipeIndex = subString.lastIndexOf("|");
-
-			return {
-				start: {
-					line: cursor.line,
-					ch: pipeIndex + 1,
-				},
-				end: {
-					line: cursor.line,
-					ch: cursor.ch,
-				},
-				query: fromUnit,
-			};
-		} catch {
+		if (
+			!isBuiltInUnit(fromUnit) &&
+			!this.plugin.settings.customUnits.some(
+				(unit) => unit.abbr === fromUnit
+			)
+		) {
 			return null;
 		}
+
+		const pipeIndex = subString.lastIndexOf("|");
+
+		return {
+			start: {
+				line: cursor.line,
+				ch: pipeIndex + 1,
+			},
+			end: {
+				line: cursor.line,
+				ch: cursor.ch,
+			},
+			query: fromUnit,
+		};
 	}
 
 	getSuggestions(context: EditorSuggestContext): DestinationUnitCompletion[] {
@@ -65,17 +66,16 @@ export default class DestinationUnitSuggest extends EditorSuggest<DestinationUni
 				.substring(context.start.ch, context.end.ch)
 				.toLowerCase();
 
-			const possibilities = convert()
-				.from(fromUnit as Unit)
-				.possibilities();
+			const possibilities = getCompatibleUnits(
+				fromUnit,
+				this.plugin.settings.customUnits
+			);
 
-			// Filter possibilities based on what the user has typed
 			return possibilities
 				.map((unit) => {
-					const measure = convert().describe(unit);
 					return {
-						label: measure.plural.toLowerCase(),
-						value: unit,
+						label: unit.plural.toLowerCase(),
+						value: unit.abbr,
 					};
 				})
 				.filter(

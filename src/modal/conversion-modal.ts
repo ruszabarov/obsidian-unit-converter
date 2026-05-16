@@ -1,63 +1,61 @@
 import { App, Modal, Setting, DropdownComponent } from "obsidian";
-import convert, { Unit, Measure } from "convert-units";
+import type { UnitConverterSettings } from "../settings";
+import {
+	listMeasures,
+	listUnits,
+} from "../utils/conversion";
+import type { MeasureCode, UnitCode } from "../utils/conversion";
 
 export class ConversionModal extends Modal {
-	value: number;
-	fromUnit: Unit;
-	toUnit: Unit;
-	fromUnitDropdown: DropdownComponent;
-	toUnitDropdown: DropdownComponent;
-	onSubmit: (value: number, fromUnit: Unit, toUnit: Unit) => void;
+	value = Number.NaN;
+	fromUnit: UnitCode = "";
+	toUnit: UnitCode = "";
+	fromUnitDropdown!: DropdownComponent;
+	toUnitDropdown!: DropdownComponent;
+	onSubmit: (value: number, fromUnit: UnitCode, toUnit: UnitCode) => void;
 
 	constructor(
 		app: App,
-		onSubmit: (value: number, fromUnit: Unit, toUnit: Unit) => void
+		private readonly settings: UnitConverterSettings,
+		onSubmit: (value: number, fromUnit: UnitCode, toUnit: UnitCode) => void
 	) {
 		super(app);
 		this.onSubmit = onSubmit;
 	}
 
-	private getCompatibleUnits(measure: Measure): Unit[] {
-		try {
-			return convert().possibilities(measure);
-		} catch {
-			return [];
-		}
+	private getCompatibleUnits(measure: MeasureCode) {
+		return listUnits(measure, this.settings.customUnits);
 	}
 
-	private updateFromUnitDropdown(measure: Measure) {
+	private updateFromUnitDropdown(measure: MeasureCode) {
 		if (!this.fromUnitDropdown) return;
 
-		// Reset dropdown options
 		this.fromUnitDropdown.selectEl.empty();
 		const compatibleUnits = this.getCompatibleUnits(measure);
 
 		compatibleUnits.forEach((unit) => {
-			const unitDesc = convert().describe(unit as Unit);
 			this.fromUnitDropdown.addOption(
-				unit,
-				unitDesc.plural.toLowerCase()
+				unit.abbr,
+				unit.plural.toLowerCase()
 			);
 		});
 
-		this.fromUnitDropdown.setValue(compatibleUnits[0]);
-		this.fromUnit = compatibleUnits[0];
+		this.fromUnitDropdown.setValue(compatibleUnits[0].abbr);
+		this.fromUnit = compatibleUnits[0].abbr;
 	}
 
-	private updateToUnitDropdown(measure: Measure) {
+	private updateToUnitDropdown(measure: MeasureCode) {
 		if (!this.toUnitDropdown) return;
 
-		// Reset dropdown options
 		this.toUnitDropdown.selectEl.empty();
 		const compatibleUnits = this.getCompatibleUnits(measure);
 
 		compatibleUnits.forEach((unit) => {
-			const measure = convert().describe(unit as Unit);
-			this.toUnitDropdown.addOption(unit, measure.plural.toLowerCase());
+			this.toUnitDropdown.addOption(unit.abbr, unit.plural.toLowerCase());
 		});
 
-		this.toUnitDropdown.setValue(compatibleUnits[0]);
-		this.toUnit = compatibleUnits[0];
+		this.toUnitDropdown.setValue(compatibleUnits[0].abbr);
+		this.toUnit = compatibleUnits[0].abbr;
 	}
 
 	onOpen() {
@@ -74,7 +72,7 @@ export class ConversionModal extends Modal {
 			});
 		});
 
-		const measures = convert().measures();
+		const measures = listMeasures();
 		const initialMeasure = measures[0];
 
 		const measureFromContainer = contentEl.createDiv({
@@ -89,9 +87,10 @@ export class ConversionModal extends Modal {
 				});
 
 				dropdown.setValue(initialMeasure);
-				dropdown.onChange((measure: Measure) => {
-					this.updateFromUnitDropdown(measure);
-					this.updateToUnitDropdown(measure);
+				dropdown.onChange((measure) => {
+					const selectedMeasure = measure as MeasureCode;
+					this.updateFromUnitDropdown(selectedMeasure);
+					this.updateToUnitDropdown(selectedMeasure);
 				});
 			});
 
@@ -103,15 +102,15 @@ export class ConversionModal extends Modal {
 
 				compatibleUnits.forEach((unit) => {
 					dropdown.addOption(
-						unit,
-						convert().describe(unit).plural.toLowerCase()
+						unit.abbr,
+						unit.plural.toLowerCase()
 					);
 				});
 
-				dropdown.setValue(compatibleUnits[0]);
-				this.fromUnit = compatibleUnits[0];
+				dropdown.setValue(compatibleUnits[0].abbr);
+				this.fromUnit = compatibleUnits[0].abbr;
 
-				dropdown.onChange((value: Unit) => {
+				dropdown.onChange((value) => {
 					this.fromUnit = value;
 				});
 			});
@@ -121,14 +120,13 @@ export class ConversionModal extends Modal {
 			const compatibleUnits = this.getCompatibleUnits(initialMeasure);
 
 			compatibleUnits.forEach((unit) => {
-				const measure = convert().describe(unit as Unit);
-				dropdown.addOption(unit, measure.plural.toLowerCase());
+				dropdown.addOption(unit.abbr, unit.plural.toLowerCase());
 			});
 
-			dropdown.setValue(compatibleUnits[0]);
-			this.toUnit = compatibleUnits[0];
+			dropdown.setValue(compatibleUnits[0].abbr);
+			this.toUnit = compatibleUnits[0].abbr;
 
-			dropdown.onChange((value: Unit) => {
+			dropdown.onChange((value) => {
 				this.toUnit = value;
 			});
 		});
@@ -138,7 +136,11 @@ export class ConversionModal extends Modal {
 				.setButtonText("Insert")
 				.setCta()
 				.onClick(() => {
-					if (this.value && this.fromUnit && this.toUnit) {
+					if (
+						Number.isFinite(this.value) &&
+						this.fromUnit &&
+						this.toUnit
+					) {
 						this.onSubmit(this.value, this.fromUnit, this.toUnit);
 						this.close();
 					}
