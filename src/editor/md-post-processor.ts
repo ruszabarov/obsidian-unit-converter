@@ -1,6 +1,5 @@
 import { MarkdownPostProcessor } from "obsidian";
-import { Unit } from "convert-units";
-import { UnitConverterSettings } from "../settings";
+import type { UnitConverterSettings } from "../settings";
 import { CONVERSION_REGEX, formatConversion } from "../utils/conversion";
 
 export function createMarkdownPostProcessor(
@@ -27,8 +26,8 @@ export function createMarkdownPostProcessor(
 				(
 					match: string,
 					valueStr: string,
-					fromUnit: Unit,
-					toUnit: Unit
+					fromUnit: string,
+					toUnit: string
 				) => {
 					const value = parseFloat(valueStr);
 					return formatConversion(
@@ -36,7 +35,8 @@ export function createMarkdownPostProcessor(
 						fromUnit,
 						toUnit,
 						settings.useDescriptiveNames,
-						settings.showOriginalUnits
+						settings.showOriginalUnits,
+						settings.customUnits
 					);
 				}
 			);

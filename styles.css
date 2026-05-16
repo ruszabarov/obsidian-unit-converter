@@ -9,3 +9,123 @@
     border-top: none;
 		padding: 0.75em 0;
 }
+
+.unit-converter-custom-units {
+	margin-top: 28px;
+	padding-top: 20px;
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.unit-converter-custom-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 12px;
+}
+
+.unit-converter-custom-header h2 {
+	margin: 0 0 4px;
+}
+
+.unit-converter-custom-header p {
+	margin: 0;
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+	line-height: 1.4;
+	max-width: 560px;
+}
+
+.unit-converter-custom-list {
+	display: grid;
+	gap: 8px;
+}
+
+.unit-converter-custom-row,
+.unit-converter-custom-form,
+.unit-converter-empty-state {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+	background: var(--background-secondary);
+}
+
+.unit-converter-custom-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 14px;
+	padding: 12px;
+}
+
+.unit-converter-custom-summary {
+	min-width: 0;
+	display: grid;
+	gap: 2px;
+}
+
+.unit-converter-custom-abbr {
+	color: var(--text-normal);
+	font-weight: var(--font-semibold);
+	overflow-wrap: anywhere;
+}
+
+.unit-converter-custom-equation {
+	color: var(--text-normal);
+	font-size: var(--font-ui-small);
+	overflow-wrap: anywhere;
+}
+
+.unit-converter-custom-meta {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	overflow-wrap: anywhere;
+}
+
+.unit-converter-custom-actions {
+	display: flex;
+	gap: 8px;
+	flex-shrink: 0;
+}
+
+.unit-converter-custom-form {
+	margin-top: 10px;
+	padding: 4px 12px 12px;
+}
+
+.unit-converter-custom-form-title {
+	padding: 12px 0 2px;
+	color: var(--text-normal);
+	font-weight: var(--font-semibold);
+}
+
+.unit-converter-custom-form .setting-item {
+	padding: 10px 0;
+	border-top-color: var(--background-modifier-border);
+}
+
+.unit-converter-validation-message {
+	min-height: 18px;
+	color: var(--text-error);
+	font-size: var(--font-ui-smaller);
+}
+
+.unit-converter-empty-state {
+	padding: 14px 12px;
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+}
+
+@media (max-width: 640px) {
+	.measure-from-container,
+	.unit-converter-custom-header,
+	.unit-converter-custom-row,
+	.unit-converter-custom-actions {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	.unit-converter-custom-actions button,
+	.unit-converter-custom-header button {
+		width: 100%;
+	}
+}
