@@ -6,7 +6,7 @@ import {
 	EditorSuggestContext,
 	EditorSuggestTriggerInfo,
 } from "obsidian";
-import { getCompatibleUnits, isBuiltInUnit } from "../utils/conversion";
+import { getCompatibleUnits, isBuiltInUnit, PARTIAL_CONVERSION_REGEX } from "../utils/conversion";
 
 interface DestinationUnitCompletion {
 	label: string;
@@ -19,11 +19,14 @@ export default class DestinationUnitSuggest extends EditorSuggest<DestinationUni
 	}
 
 	onTrigger(cursor: EditorPosition, editor: Editor): EditorSuggestTriggerInfo | null {
+		if (!this.plugin.settings.isAutosuggestEnabled) {
+			return null;
+		}
+
 		const line = editor.getLine(cursor.line);
 		const subString = line.substring(0, cursor.ch);
 
-		// Match pattern [value unit| or [value unit|text
-		const match = subString.match(/\[([\d.]+)([a-zA-Z0-9\-/]+)\|([a-zA-Z0-9-]*)/);
+		const match = subString.match(PARTIAL_CONVERSION_REGEX);
 		if (!match) return null;
 
 		const [, , fromUnit] = match;

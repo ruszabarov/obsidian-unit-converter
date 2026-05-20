@@ -1,4 +1,4 @@
-import { Plugin, Editor } from "obsidian";
+import { Editor, MarkdownView, Plugin } from "obsidian";
 import { DEFAULT_SETTINGS, UnitConverterSettings, UnitConverterSettingTab } from "./settings";
 import DestinationUnitSuggest from "./suggest/to-unit-suggest";
 import { ConversionModal } from "./modal/conversion-modal";
@@ -17,11 +17,9 @@ export default class UnitConverterPlugin extends Plugin {
 
 		this.addSettingTab(new UnitConverterSettingTab(this));
 
-		if (this.settings.isAutosuggestEnabled) {
-			this.registerEditorSuggest(new DestinationUnitSuggest(this));
-		}
+		this.registerEditorSuggest(new DestinationUnitSuggest(this));
 
-		this.registerMarkdownPostProcessor(createMarkdownPostProcessor(this.settings));
+		this.registerMarkdownPostProcessor(createMarkdownPostProcessor(this));
 
 		this.registerEditorExtension(createUnitConversionExtension(this));
 
@@ -48,5 +46,19 @@ export default class UnitConverterPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		this.refreshMarkdownViews();
+	}
+
+	refreshMarkdownViews() {
+		this.app.workspace.iterateAllLeaves((leaf) => {
+			if (!(leaf.view instanceof MarkdownView)) {
+				return;
+			}
+
+			leaf.view.editor?.refresh();
+			if (leaf.view.getMode() === "preview") {
+				leaf.view.previewMode.rerender(true);
+			}
+		});
 	}
 }

@@ -12,6 +12,8 @@
 		"dev": "rolldown --config rolldown.config.js -w",
 		"build": "rolldown --config rolldown.config.js",
 		"lint": "oxlint",
+		"test": "vitest run",
+		"typecheck": "tsc --noEmit",
 		"format": "oxfmt",
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
@@ -27,7 +29,8 @@
 		"oxfmt": "^0.49.0",
 		"oxlint": "^1.64.0",
 		"rolldown": "1.0.1",
-		"typescript": "^6.0.3"
+		"typescript": "^6.0.3",
+		"vitest": "^4.1.6"
 	},
 	"packageManager": "pnpm@11.1.3"
 }

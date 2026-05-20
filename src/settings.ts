@@ -226,7 +226,7 @@ export class UnitConverterSettingTab extends PluginSettingTab {
 			.addText((text) => {
 				text.setPlaceholder("60").setValue(draft.factor.toString());
 				text.inputEl.setAttribute("type", "number");
-				text.inputEl.setAttribute("min", "0");
+				text.inputEl.setAttribute("min", "0.0000000001");
 				text.inputEl.setAttribute("step", "any");
 				text.onChange((value) => {
 					draft.factor = Number(value);

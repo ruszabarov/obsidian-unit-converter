@@ -27,7 +27,10 @@ export interface CustomUnitValidationResult {
 	message?: string;
 }
 
-const UNIT_CODE_REGEX = /^[a-zA-Z0-9\-/]+$/;
+const UNIT_CODE_PATTERN = "[a-zA-Z0-9\\-/]+";
+const PARTIAL_UNIT_CODE_PATTERN = "[a-zA-Z0-9\\-/]*";
+const NUMBER_PATTERN = "-?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?";
+const UNIT_CODE_REGEX = new RegExp(`^${UNIT_CODE_PATTERN}$`);
 
 function getCustomUnit(
 	unit: UnitCode,
@@ -174,7 +177,7 @@ export function getDisplayUnit(
 			return (value === 1 ? measure.singular : measure.plural).toLowerCase();
 		}
 	} catch (e) {
-		console.error("Error getting descriptive name:", e);
+		console.debug("Error getting descriptive name:", e);
 	}
 
 	return unit.toString();
@@ -207,7 +210,7 @@ export function formatConversion(
 		const originalUnit = getDisplayUnit(value, fromUnit, useDescriptiveNames, customUnits);
 		return `${value} ${originalUnit} (${convertedValue.toFixed(precision)} ${displayUnit})`;
 	} catch (e) {
-		console.error("Conversion error:", e);
+		console.debug("Conversion error:", e);
 		return `[${value}${fromUnit}|${toUnit}]`; // Return original format on error
 	}
 }
@@ -237,8 +240,8 @@ export function validateCustomUnit(
 		return { isValid: false, message: "Add singular and plural names." };
 	}
 
-	if (!Number.isFinite(unit.factor) || unit.factor < 0) {
-		return { isValid: false, message: "Factor must be 0 or greater." };
+	if (!Number.isFinite(unit.factor) || unit.factor <= 0) {
+		return { isValid: false, message: "Factor must be greater than 0." };
 	}
 
 	if (!isBuiltInUnit(anchorUnit)) {
@@ -274,6 +277,16 @@ export function validateCustomUnit(
 }
 
 /**
- * Regular expression to match unit conversion syntax
+ * Regular expression to match unit conversion syntax.
  */
-export const CONVERSION_REGEX = /\[([\d.]+)([a-zA-Z0-9\-/]+)\|([a-zA-Z0-9\-/]+)\]/g;
+export const CONVERSION_REGEX = new RegExp(
+	`\\[(${NUMBER_PATTERN})(${UNIT_CODE_PATTERN})\\|(${UNIT_CODE_PATTERN})\\]`,
+	"g",
+);
+
+/**
+ * Regular expression to match an unfinished conversion before the cursor.
+ */
+export const PARTIAL_CONVERSION_REGEX = new RegExp(
+	`\\[(${NUMBER_PATTERN})(${UNIT_CODE_PATTERN})\\|(${PARTIAL_UNIT_CODE_PATTERN})$`,
+);

@@ -1,10 +1,30 @@
-import { MarkdownPostProcessor } from "obsidian";
-import type { UnitConverterSettings } from "../settings";
+import type { MarkdownPostProcessor } from "obsidian";
+import type UnitConverterPlugin from "../main";
 import { CONVERSION_REGEX, formatConversion } from "../utils/conversion";
 
-export function createMarkdownPostProcessor(
-	settings: UnitConverterSettings,
-): MarkdownPostProcessor {
+export function isWithinIgnoredMarkdownElement(node: Node): boolean {
+	let element = node.parentElement;
+
+	while (element) {
+		if (element.tagName === "CODE" || element.tagName === "PRE") {
+			return true;
+		}
+
+		if (
+			element.classList.contains("HyperMD-codeblock") ||
+			element.classList.contains("cm-inline-code") ||
+			element.classList.contains("frontmatter")
+		) {
+			return true;
+		}
+
+		element = element.parentElement;
+	}
+
+	return false;
+}
+
+export function createMarkdownPostProcessor(plugin: UnitConverterPlugin): MarkdownPostProcessor {
 	return (element: HTMLElement) => {
 		const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null);
 		let node = walker.nextNode();
@@ -12,11 +32,12 @@ export function createMarkdownPostProcessor(
 		while (node) {
 			const text = node.nodeValue;
 
-			if (!text) {
+			if (!text || isWithinIgnoredMarkdownElement(node)) {
 				node = walker.nextNode();
 				continue;
 			}
 
+			CONVERSION_REGEX.lastIndex = 0;
 			const newText = text.replace(
 				CONVERSION_REGEX,
 				(match: string, valueStr: string, fromUnit: string, toUnit: string) => {
@@ -25,9 +46,9 @@ export function createMarkdownPostProcessor(
 						value,
 						fromUnit,
 						toUnit,
-						settings.useDescriptiveNames,
-						settings.showOriginalUnits,
-						settings.customUnits,
+						plugin.settings.useDescriptiveNames,
+						plugin.settings.showOriginalUnits,
+						plugin.settings.customUnits,
 					);
 				},
 			);
